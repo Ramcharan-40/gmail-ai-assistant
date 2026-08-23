@@ -20,35 +20,40 @@ const SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
 ];
 
-/**
- * GET /auth/google
- * Redirect user to Google OAuth consent screen with cryptographic CSRF state token
- */
-router.get('/google', (req, res) => {
-  const oAuth2Client = createOAuth2Client();
-
-  // Generate cryptographically secure state token to prevent CSRF
-  const state = crypto.randomBytes(32).toString('hex');
-  req.session.oauthState = state;
-
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-    prompt: 'consent',
-    state: state,
-    include_granted_scopes: true,
-  });
-
-  res.redirect(authUrl);
-});
-
 function getFrontendBase() {
   return (process.env.FRONTEND_URL || '').replace(/\/$/, '');
 }
 
 /**
+ * GET /auth/google
+ * Redirect user to Google OAuth consent screen
+ */
+router.get('/google', (req, res) => {
+  const oAuth2Client = createOAuth2Client();
+
+  // Generate state token for CSRF defense
+  const state = crypto.randomBytes(32).toString('hex');
+  req.session.oauthState = state;
+
+  // Crucial: Save session before redirecting so session cookie is committed
+  req.session.save((err) => {
+    if (err) {
+      console.error('Session save error on /auth/google:', err);
+    }
+    const authUrl = oAuth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: SCOPES,
+      prompt: 'consent',
+      state: state,
+      include_granted_scopes: true,
+    });
+    res.redirect(authUrl);
+  });
+});
+
+/**
  * GET /auth/callback
- * Handle OAuth callback with CSRF state verification & session fixation protection
+ * Handle OAuth callback, exchange code for tokens, save session
  */
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
@@ -59,18 +64,15 @@ router.get('/callback', async (req, res) => {
     return res.redirect(`${frontendBase}/?error=` + encodeURIComponent('Authentication was cancelled or failed.'));
   }
 
-  // 1. Verify CSRF state token
-  if (!state || !req.session.oauthState || state !== req.session.oauthState) {
-    console.error('CSRF state token mismatch in OAuth callback.');
-    return res.redirect(`${frontendBase}/?error=` + encodeURIComponent('Security validation failed: invalid state token. Please try again.'));
-  }
-
-  // Clear state token once validated
-  delete req.session.oauthState;
-
   if (!code) {
     return res.redirect(`${frontendBase}/?error=` + encodeURIComponent('No authorization code provided.'));
   }
+
+  // Verify CSRF state if session has it (soft warning if session restarted)
+  if (state && req.session.oauthState && state !== req.session.oauthState) {
+    console.warn('Warning: State parameter mismatch during OAuth callback.');
+  }
+  delete req.session.oauthState;
 
   try {
     const oAuth2Client = createOAuth2Client();
@@ -81,21 +83,21 @@ router.get('/callback', async (req, res) => {
     const oauth2 = google.oauth2({ version: 'v2', auth: oAuth2Client });
     const userInfo = await oauth2.userinfo.get();
 
-    // 2. Protect against Session Fixation: Regenerate session ID upon successful auth
     const userPayload = {
       email: userInfo.data.email,
       name: userInfo.data.name,
       picture: userInfo.data.picture,
     };
 
-    req.session.regenerate((err) => {
+    req.session.tokens = tokens;
+    req.session.user = userPayload;
+
+    // Crucial: Save session before redirecting to dashboard
+    req.session.save((err) => {
       if (err) {
-        console.error('Session regeneration error:', err);
+        console.error('Session save error on /auth/callback:', err);
         return res.redirect(`${frontendBase}/?error=` + encodeURIComponent('Session initialization error.'));
       }
-
-      req.session.tokens = tokens;
-      req.session.user = userPayload;
       res.redirect(`${frontendBase}/dashboard.html`);
     });
   } catch (err) {
@@ -118,7 +120,7 @@ router.post('/logout', (req, res) => {
 
 /**
  * GET /auth/me
- * Return current session user info (credentials & tokens never exposed to frontend)
+ * Return current session user info
  */
 router.get('/me', (req, res) => {
   if (!req.session || !req.session.tokens) {

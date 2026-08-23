@@ -12,7 +12,7 @@ const aiRoutes = require('./routes/ai');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production' && !(process.env.FRONTEND_URL || '').includes('localhost');
 
 // ─── Trust Reverse Proxy (Required for Render & HTTPS Cookies) ──
 app.set('trust proxy', 1);
