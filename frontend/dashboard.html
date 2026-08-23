@@ -125,6 +125,7 @@
           <button class="action-btn" id="btn-star">⭐ Star</button>
           <button class="action-btn" id="btn-archive">📦 Archive</button>
           <button class="action-btn" id="btn-mark-unread">✉️ Mark Unread</button>
+          <button class="action-btn" id="btn-toggle-contrast" title="Toggle email background contrast">🌓 Invert View</button>
           <button class="action-btn danger" id="btn-delete">🗑️ Delete</button>
         </div>
       </div>
@@ -134,8 +135,10 @@
         <div class="loading-inline hidden" id="body-loading">
           <div class="spinner"></div> Loading email...
         </div>
-        <div class="email-body" id="email-body-html"></div>
-        <div class="email-body-text hidden" id="email-body-text"></div>
+        <div class="email-body-card light-mode" id="email-body-card">
+          <div class="email-body" id="email-body-html"></div>
+          <div class="email-body-text hidden" id="email-body-text"></div>
+        </div>
       </div>
 
       <!-- Thread -->

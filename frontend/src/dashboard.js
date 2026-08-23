@@ -335,6 +335,24 @@ $('btn-mark-unread').addEventListener('click', async () => {
   } catch (err) { showToast(err.message, 'error'); }
 });
 
+// ─── Email Contrast Toggle ───────────────────────────────
+const savedContrast = localStorage.getItem('INBOXAI_CONTRAST') || 'light';
+const emailCard = $('email-body-card');
+if (emailCard) {
+  emailCard.className = `email-body-card ${savedContrast}-mode`;
+}
+
+$('btn-toggle-contrast')?.addEventListener('click', () => {
+  const card = $('email-body-card');
+  if (!card) return;
+  const isLight = card.classList.contains('light-mode');
+  card.classList.toggle('light-mode', !isLight);
+  card.classList.toggle('dark-mode', isLight);
+  const newMode = isLight ? 'dark' : 'light';
+  localStorage.setItem('INBOXAI_CONTRAST', newMode);
+  showToast(isLight ? '🌙 Dark view enabled' : '☀️ Inverted high-contrast view enabled', 'info');
+});
+
 $('btn-reply').addEventListener('click', () => {
   if (!state.selectedEmail) return;
   // Switch to AI reply tab

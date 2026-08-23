@@ -650,56 +650,131 @@ input, textarea, select { font-family: inherit; }
   background: var(--primary-dim);
 }
 
-/* Email body — force white/light text and high contrast */
+/* ─── Email Body Card (High-Contrast Inverted / Light & Dark) ── */
 .email-body-container {
-  padding: var(--space-6);
+  padding: var(--space-5) var(--space-6);
   flex: 1;
 }
 
-.email-body {
+.email-body-card {
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Light / Inverted Mode (Default for crisp, true-to-design HTML email readability) */
+.email-body-card.light-mode {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.email-body-card.light-mode .email-body {
+  color: #1a1a1a;
+}
+
+.email-body-card.light-mode .email-body,
+.email-body-card.light-mode .email-body p,
+.email-body-card.light-mode .email-body span,
+.email-body-card.light-mode .email-body div,
+.email-body-card.light-mode .email-body td,
+.email-body-card.light-mode .email-body th,
+.email-body-card.light-mode .email-body li,
+.email-body-card.light-mode .email-body h1,
+.email-body-card.light-mode .email-body h2,
+.email-body-card.light-mode .email-body h3,
+.email-body-card.light-mode .email-body h4,
+.email-body-card.light-mode .email-body h5,
+.email-body-card.light-mode .email-body h6,
+.email-body-card.light-mode .email-body strong,
+.email-body-card.light-mode .email-body em,
+.email-body-card.light-mode .email-body b {
+  color: #1a1a1a;
+}
+
+.email-body-card.light-mode .email-body a {
+  color: #2563eb !important;
+  text-decoration: underline;
+}
+
+.email-body-card.light-mode .email-body blockquote {
+  border-left: 3px solid #cbd5e1;
+  padding-left: var(--space-4);
+  color: #64748b !important;
+  margin: var(--space-4) 0;
+}
+
+.email-body-card.light-mode .email-body-text {
+  color: #1a1a1a;
+  font-family: inherit;
+  white-space: pre-wrap;
   font-size: 0.92rem;
   line-height: 1.8;
-  color: #ffffff;
-  max-width: 760px;
 }
 
-/* Force light color on all nested email elements to counter dark email HTML styles */
-.email-body,
-.email-body p,
-.email-body span,
-.email-body div,
-.email-body td,
-.email-body th,
-.email-body li,
-.email-body h1,
-.email-body h2,
-.email-body h3,
-.email-body h4,
-.email-body h5,
-.email-body h6,
-.email-body strong,
-.email-body em,
-.email-body b {
-  color: #f5f5f5 !important;
+/* Dark Mode */
+.email-body-card.dark-mode {
+  background: #141414;
+  color: #f3f4f6;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 
-.email-body * { max-width: 100%; }
-.email-body a { color: #ffffff !important; text-decoration: underline; }
-.email-body img { height: auto; border-radius: var(--radius-sm); max-width: 100%; }
-.email-body table { max-width: 100% !important; }
-.email-body blockquote {
+.email-body-card.dark-mode .email-body {
+  color: #f3f4f6;
+}
+
+.email-body-card.dark-mode .email-body,
+.email-body-card.dark-mode .email-body p,
+.email-body-card.dark-mode .email-body span,
+.email-body-card.dark-mode .email-body div,
+.email-body-card.dark-mode .email-body td,
+.email-body-card.dark-mode .email-body th,
+.email-body-card.dark-mode .email-body li,
+.email-body-card.dark-mode .email-body h1,
+.email-body-card.dark-mode .email-body h2,
+.email-body-card.dark-mode .email-body h3,
+.email-body-card.dark-mode .email-body h4,
+.email-body-card.dark-mode .email-body h5,
+.email-body-card.dark-mode .email-body h6,
+.email-body-card.dark-mode .email-body strong,
+.email-body-card.dark-mode .email-body em,
+.email-body-card.dark-mode .email-body b {
+  color: #f3f4f6;
+}
+
+.email-body-card.dark-mode .email-body a {
+  color: #60a5fa !important;
+  text-decoration: underline;
+}
+
+.email-body-card.dark-mode .email-body blockquote {
   border-left: 2px solid var(--border);
   padding-left: var(--space-4);
   color: var(--text-muted) !important;
   margin: var(--space-4) 0;
 }
 
-.email-body-text {
+.email-body-card.dark-mode .email-body-text {
+  color: #f3f4f6;
   white-space: pre-wrap;
   font-size: 0.92rem;
   line-height: 1.8;
-  color: #ffffff;
 }
+
+.email-body {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  max-width: 100%;
+}
+
+.email-body * { max-width: 100%; }
+.email-body img { height: auto; border-radius: var(--radius-sm); max-width: 100%; }
+.email-body table { max-width: 100% !important; }
+
 
 /* Thread */
 .thread-section {
