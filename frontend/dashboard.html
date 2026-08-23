@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InboxAI — Dashboard</title>
+  <meta name="description" content="Manage your Gmail with AI-powered summarization and smart replies." />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<!-- ═══ APP LAYOUT ═══════════════════════════════════════════ -->
+<div class="app" id="app">
+
+  <!-- ─── Sidebar ─────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-logo">✉️</div>
+      <div>
+        <div class="app-name">InboxAI</div>
+        <div class="app-tagline">Powered by Gemini</div>
+      </div>
+    </div>
+
+    <button class="btn-compose" id="compose-btn">
+      ✏️ Compose
+    </button>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Mailbox</div>
+      <div class="nav-item active" data-label="INBOX" id="nav-inbox">
+        <span class="icon">📥</span>
+        <span class="label">Inbox</span>
+        <span class="nav-badge hidden" id="unread-badge">0</span>
+      </div>
+      <div class="nav-item" data-label="STARRED" id="nav-starred">
+        <span class="icon">⭐</span>
+        <span class="label">Starred</span>
+      </div>
+      <div class="nav-item" data-label="SENT" id="nav-sent">
+        <span class="icon">📤</span>
+        <span class="label">Sent</span>
+      </div>
+      <div class="nav-item" data-label="TRASH" id="nav-trash">
+        <span class="icon">🗑️</span>
+        <span class="label">Trash</span>
+      </div>
+
+      <div class="nav-section-title">Activity</div>
+      <div class="nav-item" id="nav-history">
+        <span class="icon">🕐</span>
+        <span class="label">History</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-pill" id="user-pill" title="Click to sign out">
+        <div class="user-avatar-placeholder" id="user-avatar-placeholder">?</div>
+        <img class="user-avatar hidden" id="user-avatar-img" src="" alt="avatar" />
+        <div>
+          <div class="user-name" id="user-name">Loading...</div>
+          <div class="user-email" id="user-email"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── Email List Panel ──────────────────────────────────── -->
+  <section class="email-list-panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title" id="panel-title">Inbox</div>
+        <div class="panel-subtitle" id="panel-subtitle">Loading...</div>
+      </div>
+      <button class="action-btn" id="refresh-btn" title="Refresh">🔄</button>
+    </div>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search emails..." autocomplete="off" />
+    </div>
+
+    <div class="email-list" id="email-list">
+      <!-- Skeleton loading -->
+      <div id="email-skeleton">
+        <div class="skeleton-email"><div class="sk-line skeleton sk-wide"></div><div class="sk-line skeleton sk-medium"></div><div class="sk-line skeleton sk-narrow"></div></div>
+        <div class="skeleton-email"><div class="sk-line skeleton sk-wide"></div><div class="sk-line skeleton sk-medium"></div><div class="sk-line skeleton sk-narrow"></div></div>
+        <div class="skeleton-email"><div class="sk-line skeleton sk-wide"></div><div class="sk-line skeleton sk-medium"></div><div class="sk-line skeleton sk-narrow"></div></div>
+        <div class="skeleton-email"><div class="sk-line skeleton sk-wide"></div><div class="sk-line skeleton sk-medium"></div><div class="sk-line skeleton sk-narrow"></div></div>
+        <div class="skeleton-email"><div class="sk-line skeleton sk-wide"></div><div class="sk-line skeleton sk-medium"></div><div class="sk-line skeleton sk-narrow"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Email Detail Panel ───────────────────────────────── -->
+  <main class="email-detail-panel">
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-state-icon">📬</div>
+      <h3>Select an email to read</h3>
+      <p>Choose from your inbox on the left</p>
+    </div>
+
+    <!-- Email detail (hidden until email selected) -->
+    <div class="email-detail hidden" id="email-detail">
+
+      <div class="email-detail-header">
+        <div class="email-detail-subject" id="detail-subject">Subject</div>
+
+        <div class="email-meta">
+          <div class="email-sender-info">
+            <div class="sender-avatar" id="detail-avatar">?</div>
+            <div class="sender-details">
+              <div class="sender-full" id="detail-from-name">Sender</div>
+              <div class="sender-addr" id="detail-from-email"></div>
+              <div class="email-to" id="detail-to"></div>
+            </div>
+          </div>
+          <div class="email-date-full" id="detail-date"></div>
+        </div>
+
+        <div class="email-action-bar">
+          <button class="action-btn" id="btn-reply">💬 Reply</button>
+          <button class="action-btn" id="btn-star">⭐ Star</button>
+          <button class="action-btn" id="btn-archive">📦 Archive</button>
+          <button class="action-btn" id="btn-mark-unread">✉️ Mark Unread</button>
+          <button class="action-btn danger" id="btn-delete">🗑️ Delete</button>
+        </div>
+      </div>
+
+      <!-- Email body -->
+      <div class="email-body-container" id="email-body-container">
+        <div class="loading-inline hidden" id="body-loading">
+          <div class="spinner"></div> Loading email...
+        </div>
+        <div class="email-body" id="email-body-html"></div>
+        <div class="email-body-text hidden" id="email-body-text"></div>
+      </div>
+
+      <!-- Thread -->
+      <div class="thread-section hidden" id="thread-section">
+        <div class="thread-title">Thread</div>
+        <div id="thread-list"></div>
+      </div>
+
+      <!-- AI Panel -->
+      <div class="ai-panel" id="ai-panel">
+        <div class="ai-panel-header" id="ai-panel-toggle">
+          <div class="ai-panel-title">
+            ✨ AI Features
+            <span class="ai-badge">GEMINI</span>
+          </div>
+          <span id="ai-chevron">▲</span>
+        </div>
+
+        <div class="ai-panel-body open" id="ai-panel-body">
+          <div class="ai-tabs">
+            <button class="ai-tab active" data-tab="summarize" id="tab-summarize">⚡ Summarize</button>
+            <button class="ai-tab" data-tab="reply" id="tab-reply">✍️ Generate Reply</button>
+            <button class="ai-tab" data-tab="classify" id="tab-classify">🏷️ Classify</button>
+          </div>
+
+          <!-- Summarize tab -->
+          <div id="panel-summarize">
+            <button class="action-btn primary" id="btn-summarize">⚡ Summarize Email</button>
+            <div class="ai-summary-card mt-3 hidden" id="summary-result">
+              <div class="ai-summary-header">
+                ✨ AI Summary
+              </div>
+              <div class="ai-summary-text" id="summary-text"></div>
+            </div>
+            <div class="loading-inline hidden" id="summarize-loading">
+              <div class="spinner"></div> Analyzing email...
+            </div>
+          </div>
+
+          <!-- Reply tab -->
+          <div id="panel-reply" class="hidden">
+            <div class="reply-section">
+              <div>
+                <label style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;display:block;">Tone</label>
+                <div class="tone-selector">
+                  <button class="tone-btn active" data-tone="professional">Professional</button>
+                  <button class="tone-btn" data-tone="friendly">Friendly</button>
+                  <button class="tone-btn" data-tone="formal">Formal</button>
+                  <button class="tone-btn" data-tone="concise">Concise</button>
+                </div>
+              </div>
+              <button class="action-btn primary" id="btn-gen-reply">✍️ Generate Reply</button>
+              <div class="loading-inline hidden" id="reply-loading">
+                <div class="spinner"></div> Crafting reply...
+              </div>
+              <textarea class="reply-textarea hidden" id="reply-textarea" placeholder="AI-generated reply will appear here. Edit before sending..."></textarea>
+              <div class="reply-actions hidden" id="reply-actions">
+                <button class="action-btn primary" id="btn-send-reply">📤 Send Reply</button>
+                <button class="action-btn" id="btn-regen-reply">🔄 Regenerate</button>
+                <button class="action-btn" id="btn-open-compose-reply">📝 Edit in Compose</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Classify tab -->
+          <div id="panel-classify" class="hidden">
+            <button class="action-btn primary" id="btn-classify">🏷️ Classify Email</button>
+            <div class="loading-inline hidden" id="classify-loading">
+              <div class="spinner"></div> Classifying...
+            </div>
+            <div class="ai-classify-card mt-3 hidden" id="classify-result"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ═══ COMPOSE MODAL ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="compose-modal">
+  <div class="compose-modal">
+    <div class="compose-header">
+      <div class="compose-title">✏️ New Message</div>
+      <button class="compose-close" id="compose-close">✕</button>
+    </div>
+    <div class="compose-body">
+      <div class="compose-field">
+        <label>To</label>
+        <input type="email" id="compose-to" placeholder="recipient@example.com" />
+      </div>
+      <div class="compose-field">
+        <label>Cc</label>
+        <input type="email" id="compose-cc" placeholder="cc@example.com (optional)" />
+      </div>
+      <div class="compose-field">
+        <label>Subject</label>
+        <input type="text" id="compose-subject" placeholder="Subject" />
+      </div>
+      <div class="compose-body-area">
+        <textarea id="compose-body" placeholder="Write your message here..."></textarea>
+      </div>
+    </div>
+    <div class="compose-footer">
+      <button class="compose-ai-btn" id="btn-ai-subject" title="Generate subject with AI">
+        ✨ AI Subject
+      </button>
+      <button class="send-btn" id="compose-send-btn">📤 Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST CONTAINER ══════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/config.js"></script>
+<script src="/src/api.js"></script>
+<script src="/src/compose.js"></script>
+<script src="/src/dashboard.js"></script>
+</body>
+</html>
