@@ -14,6 +14,15 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production' && !(process.env.FRONTEND_URL || '').includes('localhost');
 
+const SQLiteStore = require('connect-sqlite3')(session);
+const fs = require('fs');
+
+// Ensure data dir exists for SQLite sessions
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
 // ─── Trust Reverse Proxy (Required for Render & HTTPS Cookies) ──
 app.set('trust proxy', 1);
 
@@ -48,7 +57,7 @@ app.use(cors({
     if (allowedOrigins.includes(cleanedOrigin) || !isProd) {
       return callback(null, true);
     }
-    return callback(null, true); // Permissive in deployment to avoid CORS blocking Vercel previews
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
   credentials: true,
 }));
@@ -57,8 +66,13 @@ app.use(cors({
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ─── Session Management ───────────────────────────────────────
+// ─── Session Management (Persistent SQLite Store) ─────────────
 app.use(session({
+  store: new SQLiteStore({
+    db: 'sessions.sqlite',
+    dir: dataDir,
+    concurrentDB: true,
+  }),
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
   resave: false,
   saveUninitialized: false,

@@ -1,13 +1,8 @@
 /**
- * Frontend Configuration — Smart Auto-Detect
+ * Frontend Configuration
  *
- * - On localhost: Automatically connects to local backend (http://localhost:3001)
- * - On Vercel / Production: Automatically connects to live Render backend
+ * For local development: Leave BACKEND_URL as "" (empty string).
+ * For Vercel deployment: Set BACKEND_URL to your Render backend URL:
+ * e.g. window.BACKEND_URL = "https://your-gmail-backend.onrender.com";
  */
-const isLocalhost = 
-  window.location.hostname === 'localhost' || 
-  window.location.hostname === '127.0.0.1';
-
-window.BACKEND_URL = isLocalhost 
-  ? "" 
-  : "https://gmail-ai-assistant-ezgp.onrender.com";
+window.BACKEND_URL = "";

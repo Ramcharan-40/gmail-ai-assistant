@@ -102,8 +102,8 @@ async function listEmails(tokens, { pageToken, maxResults = 20, labelIds = ['INB
     return { emails: [], nextPageToken: null };
   }
 
-  // Batch fetch message metadata
-  const emails = await Promise.all(
+  // Batch fetch message metadata safely
+  const emailResults = await Promise.all(
     messages.map(({ id }) =>
       gmail.users.messages.get({
         userId: 'me',
@@ -111,8 +111,14 @@ async function listEmails(tokens, { pageToken, maxResults = 20, labelIds = ['INB
         format: 'metadata',
         metadataHeaders: ['From', 'To', 'Subject', 'Date'],
       }).then(r => formatMessage(r.data))
+        .catch(err => {
+          console.warn(`Failed to fetch message metadata for ${id}:`, err.message);
+          return null;
+        })
     )
   );
+
+  const emails = emailResults.filter(Boolean);
 
   return { emails, nextPageToken: listRes.data.nextPageToken || null };
 }

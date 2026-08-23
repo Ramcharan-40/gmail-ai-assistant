@@ -1,0 +1,11 @@
+{
+  "watch": ["server.js", "routes", "services", "middleware"],
+  "ext": "js,mjs,cjs,json",
+  "ignore": [
+    "node_modules",
+    "*.log",
+    "*.tmp",
+    ".git"
+  ],
+  "delay": 500
+}

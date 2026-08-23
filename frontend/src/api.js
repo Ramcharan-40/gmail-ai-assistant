@@ -22,9 +22,12 @@ async function request(path, options = {}) {
   });
 
   if (res.status === 401) {
-    // Session expired — redirect to login
-    window.location.href = '/';
-    return;
+    // Session expired — redirect to login only if not already on the landing page
+    const isLanding = window.location.pathname === '/' || window.location.pathname.endsWith('index.html') || window.location.pathname === '';
+    if (!isLanding) {
+      window.location.href = '/';
+    }
+    return { authenticated: false };
   }
 
   const data = await res.json().catch(() => ({}));
