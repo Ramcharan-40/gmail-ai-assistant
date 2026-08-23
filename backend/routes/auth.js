@@ -4,11 +4,23 @@ const { google } = require('googleapis');
 
 const router = express.Router();
 
-function createOAuth2Client() {
+function getRedirectUri(req) {
+  if (process.env.GOOGLE_REDIRECT_URI && process.env.GOOGLE_REDIRECT_URI.startsWith('http')) {
+    return process.env.GOOGLE_REDIRECT_URI.replace(/\/$/, '');
+  }
+  if (req) {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.get('host');
+    return `${protocol}://${host}/auth/callback`;
+  }
+  return 'http://localhost:3001/auth/callback';
+}
+
+function createOAuth2Client(req) {
   return new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
+    getRedirectUri(req)
   );
 }
 
@@ -20,8 +32,16 @@ const SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
 ];
 
-function getFrontendBase() {
-  return (process.env.FRONTEND_URL || '').replace(/\/$/, '');
+function getFrontendBase(req) {
+  if (process.env.FRONTEND_URL && process.env.FRONTEND_URL.trim() !== '') {
+    return process.env.FRONTEND_URL.replace(/\/$/, '');
+  }
+  if (req) {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.get('host');
+    return `${protocol}://${host}`;
+  }
+  return '';
 }
 
 /**
@@ -29,7 +49,7 @@ function getFrontendBase() {
  * Redirect user to Google OAuth consent screen
  */
 router.get('/google', (req, res) => {
-  const oAuth2Client = createOAuth2Client();
+  const oAuth2Client = createOAuth2Client(req);
 
   // Generate state token for CSRF defense
   const state = crypto.randomBytes(32).toString('hex');
@@ -57,7 +77,7 @@ router.get('/google', (req, res) => {
  */
 router.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
-  const frontendBase = getFrontendBase();
+  const frontendBase = getFrontendBase(req);
 
   if (error) {
     console.warn('OAuth authorization error returned from Google:', error);
@@ -75,7 +95,7 @@ router.get('/callback', async (req, res) => {
   delete req.session.oauthState;
 
   try {
-    const oAuth2Client = createOAuth2Client();
+    const oAuth2Client = createOAuth2Client(req);
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
 
