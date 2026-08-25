@@ -2,7 +2,7 @@
  * api.js — Centralized fetch wrapper for backend API
  */
 
-const API_BASE = (window.BACKEND_URL || localStorage.getItem('INBOXAI_BACKEND_URL') || '').replace(/\/$/, '');
+const API_BASE = (window.BACKEND_URL || localStorage.getItem('INBOXMATE_BACKEND_URL') || localStorage.getItem('INBOXAI_BACKEND_URL') || '').replace(/\/$/, '');
 
 class ApiError extends Error {
   constructor(message, status) {

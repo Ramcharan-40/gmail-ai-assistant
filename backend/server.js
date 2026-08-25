@@ -121,7 +121,7 @@ app.use((err, req, res, next) => {
 
 // ─── Start server ─────────────────────────────────────────────
 const server = app.listen(PORT, () => {
-  console.log(`\n🚀 Gmail AI Assistant running at http://localhost:${PORT}`);
+  console.log(`\n🚀 InboxMate running at http://localhost:${PORT}`);
   console.log(`📧 Connect your Gmail account to get started\n`);
 });
 

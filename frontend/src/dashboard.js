@@ -336,7 +336,7 @@ $('btn-mark-unread').addEventListener('click', async () => {
 });
 
 // ─── Email Contrast Toggle ───────────────────────────────
-const savedContrast = localStorage.getItem('INBOXAI_CONTRAST') || 'light';
+const savedContrast = localStorage.getItem('INBOXMATE_CONTRAST') || localStorage.getItem('INBOXAI_CONTRAST') || 'light';
 const emailCard = $('email-body-card');
 if (emailCard) {
   emailCard.className = `email-body-card ${savedContrast}-mode`;
@@ -349,7 +349,7 @@ $('btn-toggle-contrast')?.addEventListener('click', () => {
   card.classList.toggle('light-mode', !isLight);
   card.classList.toggle('dark-mode', isLight);
   const newMode = isLight ? 'dark' : 'light';
-  localStorage.setItem('INBOXAI_CONTRAST', newMode);
+  localStorage.setItem('INBOXMATE_CONTRAST', newMode);
   showToast(isLight ? '🌙 Dark view enabled' : '☀️ Inverted high-contrast view enabled', 'info');
 });
 
@@ -628,7 +628,7 @@ $('refresh-btn').addEventListener('click', () => {
 
 // ─── Logout ───────────────────────────────────────────────
 $('user-pill').addEventListener('click', async () => {
-  if (!confirm('Sign out of InboxAI?')) return;
+  if (!confirm('Sign out of InboxMate?')) return;
   try {
     await AuthAPI.logout();
     window.location.href = '/';

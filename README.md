@@ -1,4 +1,4 @@
-# 📧 InboxAI — AI-Powered Gmail Assistant
+# 📧 InboxMate — AI-Powered Gmail Assistant
 
 An intelligent email management application that connects to Gmail via OAuth and uses Google Gemini AI to summarize emails, generate smart replies, and classify your inbox.
 

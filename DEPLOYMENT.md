@@ -1,6 +1,6 @@
 # 🚀 Full-Stack Deployment Guide: Render & Vercel
 
-Follow these exact steps to complete the deployment of the **Gmail AI Assistant**.
+Follow these exact steps to complete the deployment of **InboxMate** (AI-Powered Gmail Assistant).
 
 ---
 
@@ -83,7 +83,7 @@ Ensure your Render **Environment Variables** are set as follows:
 1. **Fix Branding (OAuth Consent Screen)**:
    - Go to [Google Cloud Console Branding Page](https://console.cloud.google.com/auth/branding?project=gmail-ai-assistant-v2-506417).
    - Fill in:
-     - **App name**: `Gmail AI Assistant`
+     - **App name**: `InboxMate`
      - **User support email**: `s3files01@gmail.com`
      - **Developer contact information**: `s3files01@gmail.com`
      - **App Home page**: `https://<your-app-name>.vercel.app` (or leave blank if still in test mode)
