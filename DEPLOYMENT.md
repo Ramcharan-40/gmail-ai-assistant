@@ -86,7 +86,9 @@ Ensure your Render **Environment Variables** are set as follows:
      - **App name**: `Gmail AI Assistant`
      - **User support email**: `s3files01@gmail.com`
      - **Developer contact information**: `s3files01@gmail.com`
-   - ⚠️ **Leave all domain fields (Home page, Privacy policy, Terms) and Authorized domains BLANK.**
+     - **App Home page**: `https://<your-app-name>.vercel.app` (or leave blank if still in test mode)
+     - **Application privacy policy link**: `https://<your-app-name>.vercel.app/privacy.html`
+     - **Application terms of service link**: `https://<your-app-name>.vercel.app/terms.html`
    - Click **Save**.
 
 2. **Verify Audience / Test Users**:

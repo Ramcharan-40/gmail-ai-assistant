@@ -95,6 +95,19 @@ app.use('/api/ai', aiRoutes);
 // ─── Health check (Used by Render for zero-downtime health check)
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
+// ─── Legal & Static Page Routes ───────────────────────────────
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'privacy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'terms.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'dashboard.html'));
+});
+
 // ─── Catch-all: serve index.html for local standalone runs ────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
